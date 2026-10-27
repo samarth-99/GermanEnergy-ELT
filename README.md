@@ -8,8 +8,8 @@ This project is an end-to-end data pipeline built on free public data and free-t
 
 ## Objective
 
-1. **Engineering:** build an automated ELT pipeline, and learn the nuances of dbt and data orchestration. 
-2. **Forecasting:** predict the hourly day-ahead price in the DE-LU bidding zone and measure honestly whether a machine learning model beats simple benchmarks.
+1. **Engineering:** build an automated ELT pipeline, and learn the nuances of dbt and data orchestration.
+2. **Forecasting:** predict the hourly day-ahead price in the DE zone and measure honestly whether a machine learning model beats simple benchmarks.
 3. **Insight:** find out which factors drive forecast accuracy, in particular how much depends on weather information and how performance differs by season.
 
 ## Approach in brief
