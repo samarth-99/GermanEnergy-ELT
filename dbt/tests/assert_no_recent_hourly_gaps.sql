@@ -5,7 +5,7 @@ with expected as (
     select ts
     from unnest(generate_timestamp_array(
         timestamp_sub(timestamp_trunc(current_timestamp(), hour), interval 30 day),
-        timestamp_sub(timestamp_trunc(current_timestamp(), hour), interval 3 day),
+        timestamp_sub(timestamp_trunc(current_timestamp(), hour), interval 5 day),
         interval 1 hour
     )) as ts
 

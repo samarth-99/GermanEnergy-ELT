@@ -62,12 +62,11 @@ pip install -r requirements.txt
 cp .env.example .env            # edit GCP_PROJECT, then: source .env
 gcloud auth application-default login #or what i did was create a key for user in bigquery and run below command
 
-conda activate energy-elt
-conda env config vars set GOOGLE_APPLICATION_CREDENTIALS="path/sa-key.json"
-conda env config vars set GCP_PROJECT=project-id
-conda env config vars set BQ_LOCATION=EU
-conda deactivate
-conda activate energy-elt
+
+  $env:GOOGLE_APPLICATION_CREDENTIALS = "path\sa-key.json"
+  $env:GCP_PROJECT = "your-project-id"
+  $env:BQ_LOCATION = "EU"
+
 
 python -m ingestion.extract_load --source all --dry-run   # 1. test the APIs, no GCP writes
 python -m ingestion.extract_load --source all             # 2. backfill from 2024-01-01
