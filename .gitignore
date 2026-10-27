@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+*.json.key
+sa-key.json
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+ml/artifacts/
+.pytest_cache/
+dbt/.user.yml

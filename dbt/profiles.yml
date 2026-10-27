@@ -1,0 +1,16 @@
+# Auth uses Application Default Credentials:
+#   locally: gcloud auth application-default login
+#   in CI:   google-github-actions/auth sets GOOGLE_APPLICATION_CREDENTIALS
+energy_elt:
+  target: dev
+  outputs:
+    dev:
+      type: bigquery
+      method: oauth
+      project: "{{ env_var('GCP_PROJECT') }}"
+      dataset: staging
+      location: "{{ env_var('BQ_LOCATION', 'EU') }}"
+      threads: 4
+      priority: interactive
+      job_execution_timeout_seconds: 300
+      job_retries: 1

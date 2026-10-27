@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: stg_smard
+    description: Deduplicated SMARD time series in long format (one row per series and timestamp).
+    columns:
+      - name: series_ts_key
+        description: Surrogate key (series|timestamp). Must be unique, which proves deduplication works.
+        tests: [unique, not_null]
+      - name: series
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [price_day_ahead, grid_load, wind_onshore, wind_offshore, solar]
+      - name: ts
+        description: Start of the period, UTC.
+        tests: [not_null]
+      - name: value
+        description: Day-ahead price in EUR/MWh, or energy in MWh per period for load and generation.
+
+  - name: stg_weather
+    description: Deduplicated hourly weather per location (observations only, forecasts are dropped at ingestion).
+    columns:
+      - name: location_ts_key
+        tests: [unique, not_null]
+      - name: location
+        tests: [not_null]
+      - name: ts
+        tests: [not_null]

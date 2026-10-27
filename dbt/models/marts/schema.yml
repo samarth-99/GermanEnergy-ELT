@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: mart_hourly_features
+    description: >
+      Hourly German power market features (bidding zone DE-LU for price) joined with
+      a national weather proxy. One row per hour in UTC. Used for price forecasting.
+    columns:
+      - name: ts_utc
+        description: Start of the hour in UTC. Primary key.
+        tests: [unique, not_null]
+      - name: ts_local
+        description: Start of the hour in Europe/Berlin local time.
+      - name: season
+        description: Meteorological season derived from the local month.
+        tests:
+          - accepted_values:
+              arguments:
+                values: [winter, spring, summer, autumn]
+      - name: day_of_week
+        description: Monday = 0 through Sunday = 6, local time.
+      - name: hour_of_day
+        description: Local hour, 0 to 23.
+      - name: price_eur_mwh
+        description: Day-ahead wholesale price in EUR/MWh. Negative values are valid and occur regularly.
+        tests:
+          - not_null:
+              config:
+                severity: warn
+      - name: load_mwh
+        description: Grid load in MWh for the hour.
+      - name: wind_onshore_mwh
+        description: Onshore wind generation in MWh for the hour.
+      - name: wind_offshore_mwh
+        description: Offshore wind generation in MWh for the hour.
+      - name: solar_mwh
+        description: Solar (photovoltaic) generation in MWh for the hour.
+      - name: residual_load_mwh
+        description: Load minus wind and solar generation, in MWh. The part conventional plants and imports must cover.
+      - name: temperature_c
+        description: Air temperature in degrees Celsius, average of three German locations.
+      - name: wind_speed_kmh
+        description: Wind speed in km/h, average of three locations.
+      - name: sunshine_min
+        description: Minutes of sunshine within the hour, average of three locations.
+      - name: price_lag_24h
+        description: Price at the same hour on the previous day.
+      - name: price_lag_168h
+        description: Price at the same hour one week earlier.

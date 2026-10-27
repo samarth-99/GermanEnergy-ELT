@@ -1,0 +1,73 @@
+name: daily-elt
+
+on:
+  schedule:
+    - cron: "0 5 * * *"   # 05:00 UTC daily. GitHub may start scheduled runs late.
+  workflow_dispatch:
+    inputs:
+      start_date:
+        description: "Optional YYYY-MM-DD. Re-fetch raw data from this date (manual backfill)."
+        required: false
+        default: ""
+
+concurrency:
+  group: daily-elt
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  elt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+      BQ_LOCATION: ${{ vars.BQ_LOCATION || 'EU' }}
+      DBT_PROFILES_DIR: ${{ github.workspace }}/dbt
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Extract and load raw data
+        env:
+          START_DATE: ${{ inputs.start_date }}
+        run: |
+          ARGS=""
+          if [ -n "$START_DATE" ]; then ARGS="--start $START_DATE"; fi
+          python -m ingestion.extract_load --source all $ARGS
+
+      - name: Source freshness
+        working-directory: dbt
+        continue-on-error: true
+        run: dbt source freshness
+
+      - name: Transform and test with dbt
+        working-directory: dbt
+        run: dbt build
+
+      - name: Train and evaluate forecast
+        run: python -m ml.forecast
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: run-outputs
+          path: |
+            ml/artifacts/
+            dbt/target/run_results.json
+          if-no-files-found: ignore
+          retention-days: 14

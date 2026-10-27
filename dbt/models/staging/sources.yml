@@ -1,0 +1,21 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Append-only raw loads written by ingestion/extract_load.py.
+    schema: raw
+    tables:
+      - name: smard_raw
+        description: One row per series, timestamp and ingestion run. Contains duplicates by design.
+        config:
+          loaded_at_field: ingested_at
+          freshness:
+            warn_after: {count: 2, period: day}
+            error_after: {count: 4, period: day}
+      - name: weather_raw
+        description: One row per location, timestamp and ingestion run. Contains duplicates by design.
+        config:
+          loaded_at_field: ingested_at
+          freshness:
+            warn_after: {count: 2, period: day}
+            error_after: {count: 4, period: day}
